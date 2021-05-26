@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Lines</title>
+	<!-- include p5js -->
+	<script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+</body>
+</html>
+<script type="text/javascript">
+
+	var starting_lines = 10
+	var lines = []
+	var init_velocity = 10
+	var spread_seed = 0.98
+	var size_seed = 10
+	var resize_seed = 1
+	var max_iteration = 10
+
+	function setup(){
+		createCanvas(windowWidth, windowHeight)
+		createLines(starting_lines)
+	}
+
+	function draw(){
+		background(255)
+		for(var l in lines){
+			lines[l].draw()
+			if(!(lines[l].x  + lines[l].width > windowWidth || lines[l].x  + lines[l].width < 0 )){
+				if(!(lines[l].y  + lines[l].height > windowHeight || lines[l].y  + lines[l].height < 0 )){
+					lines[l].move()
+					lines[l].spread()
+				}
+			}
+		}
+	}
+
+	function createLines(startingLines){
+		var linesMade = 0
+		while(linesMade < startingLines){
+			var startX = random()*windowWidth
+			var startY = windowHeight * random0or1()
+			lines.push(new Line(startX, startY, size_seed, 0, color(0,0,0), 0, init_velocity, 0))
+			linesMade++
+		}
+	}
+
+	class Line{
+		constructor(x, y, width, height, color, vx, vy, iteration){
+			this.x = x
+			this.y = y
+			this.width = width
+			this.height = height
+			this.color = color
+			this.vx = vx
+			this.vy = vy
+			this.iteration = iteration
+		}
+		draw(){
+			stroke(this.color)
+			fill(this.color)
+			rect(this.x, this.y, this.width, this.height)
+		}
+		move(){
+			this.width += this.vx
+			this.height += this.vy
+		}
+		spread(){
+			if(random() > spread_seed && this.iteration < max_iteration){
+				var startX = this.x + this.width
+				var startY = this.y + this.height
+
+				var widthX
+				var heightY
+				var vx
+				var vy
+				if(this.vx == 0){
+					widthX = 0
+					heightY = size_seed/(resize_seed*this.iteration)
+					vx = init_velocity * randPosNeg()
+					vy = 0
+				}
+				else{
+					widthX = size_seed/(resize_seed*this.iteration)
+					heightY = 0
+					vx = 0
+					vy = init_velocity * randPosNeg()
+				}
+
+				lines.push(new Line(startX, startY, widthX, heightY, color(0,0,0), vx, vy, ++this.iteration))
+			}
+		}
+	}
+
+	function random0or1(){
+		if(random() < 0.5)
+			return 1
+		else return 0
+	}
+
+	function randPosNeg(){
+		if(random() > 0.5)
+			return 1
+		else return -1
+	}
+
+	function mousePressed(){
+		var startY = windowHeight * random0or1()
+		lines.push(new Line(mouseX, startY, size_seed, 0, color(0,0,0), 0, init_velocity, 0))
+	}
+
+
+</script>
